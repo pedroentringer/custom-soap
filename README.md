@@ -5,6 +5,8 @@ send SOAP requests
 ## Simple Custom SOAP
 
 ```js
+import { Soap } from '@pedroentringer/custom-soap';
+
 console.log('>> Simetrias');
 
 const soap = new Soap({

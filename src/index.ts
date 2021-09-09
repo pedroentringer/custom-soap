@@ -27,7 +27,7 @@ interface SoapResponse {
   body: string;
 }
 
-class Soap {
+export class Soap {
   private options: Options;
 
   constructor(options: Options) {
@@ -138,4 +138,3 @@ class Soap {
     };
   }
 }
-export default Soap;

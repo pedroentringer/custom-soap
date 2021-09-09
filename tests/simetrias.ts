@@ -1,4 +1,4 @@
-import Soap from '../src'
+import {Soap} from '../src'
 
 const simetrias = async () => {
   console.log(">> Simetrias")
