@@ -1,0 +1,38 @@
+{
+  "name": "@pedroentringer/custom-soap",
+  "version": "1.0.1",
+  "description": "Send SOAP requests",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "author": {
+    "name": "Pedro Entringer",
+    "email": "pedroentringer97@gmail.com",
+    "url": "https://pedroentringer.dev"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/request": "^2.48.7",
+    "@types/xml2json": "^0.11.4",
+    "prettier": "^2.4.0",
+    "typescript": "^3.8.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "prepare": "npm run build",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "dependencies": {
+    "@pedroentringer/json2xml": "^1.0.7",
+    "request": "^2.88.2",
+    "xml2json": "^0.12.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pedroentringer/custom-soap.git"
+  }
+}
