@@ -20,6 +20,7 @@ interface Options {
   envelopeAttrs?: GenericObject;
   agentOptions?: AgentOptions;
   soap12: boolean;
+  soapenv: boolean;
 }
 
 interface SoapResponse {
@@ -35,6 +36,10 @@ export class Soap {
 
     if (typeof this.options.soap12 !== 'boolean') {
       this.options.soap12 = false;
+    }
+
+    if (typeof this.options.soapenv !== 'boolean') {
+      this.options.soapenv = false;
     }
   }
 
@@ -116,6 +121,23 @@ export class Soap {
           value: {
             'soap12:Header': envelopeHeader,
             'soap12:Body': envelopeBody,
+          },
+        },
+      };
+    }
+
+    if (this.options.soapenv) {
+      soapObject = {
+        'soapenv:Envelope': {
+          attrs: {
+            'xmlns:soapenv': 'http://schemas.xmlsoap.org/soap/envelope/',
+            ...defaultEnvelopeAttrs,
+            ...this.options.envelopeAttrs,
+            ...envelopeAttrs,
+          },
+          value: {
+            'soapenv:Header': envelopeHeader,
+            'soapenv:Body': envelopeBody,
           },
         },
       };
