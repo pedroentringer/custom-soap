@@ -19,8 +19,7 @@ interface Options {
   requestHeaders?: GenericObject;
   envelopeAttrs?: GenericObject;
   agentOptions?: AgentOptions;
-  soap12: boolean;
-  soapenv: boolean;
+  prefix?: string;
 }
 
 interface SoapResponse {
@@ -34,12 +33,8 @@ export class Soap {
   constructor(options: Options) {
     this.options = options;
 
-    if (typeof this.options.soap12 !== 'boolean') {
-      this.options.soap12 = false;
-    }
-
-    if (typeof this.options.soapenv !== 'boolean') {
-      this.options.soapenv = false;
+    if (!this.options.prefix) {
+      this.options.prefix = 'soap'
     }
   }
 
@@ -95,62 +90,36 @@ export class Soap {
       'xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
     };
 
-    let soapObject: GenericObject = {
-      'soap:Envelope': {
-        attrs: {
-          ...defaultEnvelopeAttrs,
-          ...this.options.envelopeAttrs,
-          ...envelopeAttrs,
-        },
-        value: {
-          'soap:Header': envelopeHeader,
-          'soap:Body': envelopeBody,
-        },
+    const soapTags = {
+      envelope: `${this.options.prefix}:Envelope`,
+      header: `${this.options.prefix}:Header`,
+      body: `${this.options.prefix}:Body`,
+    }
+
+    let soapEnvelope: GenericObject = {}
+
+    soapEnvelope[soapTags.envelope] = {
+      attrs: {
+        ...defaultEnvelopeAttrs,
+        ...this.options.envelopeAttrs,
+        ...envelopeAttrs,
       },
-    };
-
-    if (this.options.soap12) {
-      soapObject = {
-        'soap12:Envelope': {
-          attrs: {
-            'xmlns:soap12': 'http://www.w3.org/2003/05/soap-envelope',
-            ...defaultEnvelopeAttrs,
-            ...this.options.envelopeAttrs,
-            ...envelopeAttrs,
-          },
-          value: {
-            'soap12:Header': envelopeHeader,
-            'soap12:Body': envelopeBody,
-          },
-        },
-      };
+      value: {},
     }
 
-    if (this.options.soapenv) {
-      soapObject = {
-        'soapenv:Envelope': {
-          attrs: {
-            'xmlns:soapenv': 'http://schemas.xmlsoap.org/soap/envelope/',
-            ...defaultEnvelopeAttrs,
-            ...this.options.envelopeAttrs,
-            ...envelopeAttrs,
-          },
-          value: {
-            'soapenv:Header': envelopeHeader,
-            'soapenv:Body': envelopeBody,
-          },
-        },
-      };
-    }
+    soapEnvelope[soapTags.envelope].value[soapTags.body] = envelopeBody
+    soapEnvelope[soapTags.envelope].value[soapTags.header] = envelopeHeader
 
-    const soapXml = json2xml(soapObject, { includeHeader: false });
+    const soapXml = json2xml(soapEnvelope, { includeHeader: false });
 
     const requestOptions = await this.buildSoapRequestOpt(soapXml, agentOptions, requestHeaders);
 
     const requestResponse = await this.httpPost(requestOptions);
 
-    const initialIndex = requestResponse.lastIndexOf('<soap:Body>') + 11;
-    const finalIndex = requestResponse.lastIndexOf('</soap:Body>');
+    const lastOfIndex = this.options.prefix ? this.options.prefix.length + 7 : 7;
+
+    const initialIndex = requestResponse.lastIndexOf(`<${this.options.prefix}:Body>`) + lastOfIndex;
+    const finalIndex = requestResponse.lastIndexOf(`</${this.options.prefix}:Body>`);
 
     const soapResponse = requestResponse.substring(initialIndex, finalIndex);
 

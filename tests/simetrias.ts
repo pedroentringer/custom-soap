@@ -4,7 +4,7 @@ const simetrias = async () => {
   console.log(">> Simetrias")
 
   const soap = new Soap({
-    soap12: true,
+    prefix: 'soap12',
     url: 'http://187.75.229.91:8091/WSCTE/Service_CTE.asmx',
     agentOptions: {
       rejectUnauthorized: false,
